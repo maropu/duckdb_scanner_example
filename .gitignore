@@ -1,0 +1,8 @@
+duckdb
+build
+cmake-build-debug
+.idea
+.DS_Store
+.clang-format
+.vscode
+duckdb_unittest_tempdir

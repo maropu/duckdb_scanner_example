@@ -1,0 +1,31 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    env:
+      RUST_BACKTRACE: 1
+    steps:
+      - name: Checkout pg_stats_exporter repository
+        uses: actions/checkout@v3
+        # In order to fetch changed files
+        with:
+          fetch-depth: 0
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Checkout DuckDB source code
+        run: make duckdb
+      - name: Build extension
+        run: make
+      - name: Run tests
+        run: make test
