@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build and test](https://github.com/maropu/duckdb_scanner_example/actions/workflows/build_and_tets.yml/badge.svg)](https://github.com/maropu/duckdb_scanner_example/actions/workflows/build_and_tets.yml)
+[![Build and test](https://github.com/maropu/duckdb_scanner_example/actions/workflows/build_and_tests.yml/badge.svg)](https://github.com/maropu/duckdb_scanner_example/actions/workflows/build_and_tests.yml)
 
 This repository aims not to implenet a full-fledge CSV parser for DuckDB but to demonstrate a minimum table
 function example for letting you know how to implement a custom scanner for your datasource.
@@ -75,7 +75,7 @@ bbb,2,3.14
 ccc,3,2.56
 
 $ duckdb -unsigned
-v1.1.3 af39bd0dcf
+v1.1.3 19864453f7
 Enter ".help" for usage hints.
 D LOAD './build/release/extension/csv_scanner/csv_scanner.duckdb_extension';
 D SELECT * FROM scan_csv_ex('data/test.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
