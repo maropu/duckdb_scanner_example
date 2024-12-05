@@ -203,7 +203,7 @@ static void ScanCsvFunction(ClientContext &context, TableFunctionInput &data_p, 
 
 static string ScanCsvToString(const FunctionData *bind_data_p) {
 	auto &bind_data = bind_data_p->Cast<ScanCsvBindData>();
-	return bind_data.file_handle->file_system.ExtractBaseName(bind_data.file_handle->GetPath());
+	return bind_data.file_handle->file_system.ExtractName(bind_data.file_handle->GetPath());
 }
 
 static double ScanCsvProgress(ClientContext &context, const FunctionData *bind_data_p,
