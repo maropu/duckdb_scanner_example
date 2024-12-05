@@ -89,6 +89,10 @@ D SELECT * FROM scan_csv_ex('data/test.csv', {'a': 'varchar', 'b': 'bigint', 'c'
 └─────────┴───────┴────────┘
 ```
 
+# External Resources
+
+ - [Overview of implimentation information in Japanese](https://github.com/maropu/20241129_taroleo_study/blob/master/20241129_duckdb_study/duckdb_extension.md)
+
 # Any Question?
 
 If you have any question, please feel free to leave it on [Issues](https://github.com/maropu/duckdb_scanner_example/issues)
