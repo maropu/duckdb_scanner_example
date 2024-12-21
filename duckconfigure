@@ -1,6 +1,0 @@
-#!/bin/sh
-
-[ -n "$1" ] && DUCKDB_VERSION="$1" || { echo "No DuckDB version was specified."; exit 1; }
-
-rm -rf duckdb && git clone https://github.com/duckdb/duckdb.git duckdb && \
-    git -C duckdb checkout tags/v${DUCKDB_VERSION}

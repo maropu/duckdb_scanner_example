@@ -16,15 +16,19 @@ please see [maropu/duckdb_extension_example](https://github.com/maropu/duckdb_ex
 |   |-- random.csv
 |   `-- test.csv
 |-- duckdb                          // DuckDB source code that this extension depends on
+|-- extension_config.cmake          // Extension configure file included by DuckDB's build system
+|-- makefiles
+|   `-- duckdb_extension.Makefile   // common build configuration to compile extention, copied from `duckdb/extension-ci-tools`
 |-- src
 |   |-- CMakeLists.txt              // CMake build file to list source files
 |   |-- csv_scanner_extension.cpp   // CSV parser implmenetation
 |   |-- include
 |   |   `-- csv_scanner.hpp         // Header file for the CSV parser
 |   `-- scan_csv.cpp                // Entrypoint where DuckDB loads this extension
-`-- test
-    `-- sql
-        `-- csv_scanner.test        // Test code
+|-- test
+|   `-- sql
+|       `-- csv_scanner.test        // Test code
+`-- vcpkg.json                      // Dependency definition file
 ```
 
 # Specification of this toy CSV parser
@@ -36,12 +40,9 @@ please see [maropu/duckdb_extension_example](https://github.com/maropu/duckdb_ex
 # Running this example
 
 ```bash
-$ make duckdb
-Cloning into 'duckdb'...
-...
-Note: switching to 'tags/v1.1.3'.
-...
-
+$ git submodule init
+$ git submodule update
+$ DUCKDB_GIT_VERSION=v1.1.3 make set_duckdb_version
 $ make
 mkdir -p build/release && \
 	cmake  -DEXTENSION_STATIC_BUILD=1 -DDUCKDB_EXTENSION_NAMES="csv_scanner" -DDUCKDB_EXTENSION_CSV_SCANNER_PATH="./duckdb/duckdb_scanner_example/" -DDUCKDB_EXTENSION_CSV_SCANNER_SHOULD_LINK=0 -DDUCKDB_EXTENSION_CSV_SCANNER_LOAD_TESTS=1 -DDUCKDB_EXTENSION_CSV_SCANNER_TEST_PATH="./duckdb/duckdb_scanner_example/test/sql" -DOSX_BUILD_ARCH=  -DDUCKDB_EXPLICIT_PLATFORM='' -DCMAKE_BUILD_TYPE=Release -S ./duckdb/ -B build/release && \
