@@ -25,8 +25,15 @@ public:
 	ReadOnlyCatalog(AttachedDatabase &db_p) : Catalog(db_p) {
 	}
 
+	// Used by ensuring that we did not already attach a database with the same path.
+	// Because path conflicts don't matter in read-only cases,
+	// ISTM that it is okay to return true here.
 	bool InMemory() override {
-		return false;
+		return true;
+	}
+
+	string GetDBPath() override {
+		return nullptr;
 	}
 
 	virtual idx_t GetDataBaseByteSize(ClientContext &context) = 0;

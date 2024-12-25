@@ -28,12 +28,21 @@ FROM scan_csv_ex('data/random.csv',
 buffer_size must be at least 1024 bytes
 
 statement ok
-ATTACH 'file=data/test.csv relname=testrel schema={"a": "varchar", "b": "bigint", "c": "double"}'
-	AS csv (TYPE CSV_SCANNER);
+ATTACH 'file=data/test.csv relname=test schema={"a": "varchar", "b": "bigint", "c": "double"}'
+	AS csv1 (TYPE CSV_SCANNER);
+
+statement ok
+ATTACH 'file=data/random.csv relname=random schema={"a": "varchar", "b": "bigint", "c": "double"}'
+	AS csv2 (TYPE CSV_SCANNER);
 
 query TIR
-SELECT * FROM csv.testrel;
+SELECT * FROM csv1.test;
 ----
 aaa	1	1.23
 bbb	2	3.14
 ccc	3	2.56
+
+query TIR
+SELECT count(1), sum(b), sum(c) FROM csv2.random;
+----
+300000	15156364	15041450.940000182

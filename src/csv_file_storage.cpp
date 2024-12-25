@@ -91,31 +91,37 @@ CsvFileStorageExtension::CsvFileStorageExtension() {
 CsvFileCatalog::CsvFileCatalog(AttachedDatabase &db_p, const string &file_p, const string &schname_p,
 							   const string &relname_p, const vector<LogicalType> &column_types_p,
 							   const vector<string> &column_names_p)
-	: ReadOnlyCatalog(db_p), default_schema(schname_p) {
+	: ReadOnlyCatalog(db_p), schema(schname_p), database_size(0) {
 	CreateSchemaInfo info;
-	auto schema = make_uniq<CsvFileSchemaEntry>(*this, info, file_p, relname_p, column_types_p, column_names_p);
-	entries[schname_p] = move(schema);
+	entry = make_uniq<CsvFileSchemaEntry>(*this, info, file_p, relname_p, column_types_p, column_names_p);
+}
+
+idx_t CsvFileCatalog::GetDataBaseByteSize(ClientContext &context) {
+	if (database_size > 0) {
+		return database_size;
+	}
+	auto &fs = FileSystem::GetFileSystem(context);
+	auto file = reinterpret_cast<CsvFileSchemaEntry *>(entry.get())->table->file;
+	auto file_handle = fs.OpenFile(file, FileFlags::FILE_FLAGS_READ);
+	database_size = file_handle->GetFileSize();
+	return database_size;
 }
 
 void CsvFileCatalog::Initialize(bool load_builtin) {
 }
 
 void CsvFileCatalog::ScanSchemas(ClientContext &context, std::function<void(SchemaCatalogEntry &)> callback) {
-	lock_guard<mutex> l(entry_lock);
-	for (auto &e : entries) {
-		callback(*reinterpret_cast<SchemaCatalogEntry *>(e.second.get()));
-	}
+	callback(*reinterpret_cast<SchemaCatalogEntry *>(entry.get()));
 }
 
 optional_ptr<SchemaCatalogEntry> CsvFileCatalog::GetSchema(CatalogTransaction transaction, const string &schema_name,
 														   OnEntryNotFound if_not_found,
 														   QueryErrorContext error_context) {
 	if (schema_name == DEFAULT_SCHEMA) {
-		return GetSchema(transaction, default_schema, if_not_found, error_context);
+		return GetSchema(transaction, schema, if_not_found, error_context);
 	}
-	auto it = entries.find(schema_name);
-    if (it != entries.end()) {
-		return reinterpret_cast<SchemaCatalogEntry *>(it->second.get());
+    if (schema_name == schema) {
+		return reinterpret_cast<SchemaCatalogEntry *>(entry.get());
     }
 	if (if_not_found != OnEntryNotFound::RETURN_NULL) {
 		throw BinderException("Schema with name \"%s\" not found", schema_name);

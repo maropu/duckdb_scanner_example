@@ -27,13 +27,7 @@ public:
 		return "csv_scanner";
 	}
 
-	string GetDBPath() override {
-		return "";
-	}
-
-	idx_t GetDataBaseByteSize(ClientContext &context) override {
-		return 0;
-	}
+	idx_t GetDataBaseByteSize(ClientContext &context) override;
 
 	void Initialize(bool load_builtin) override;
 	void ScanSchemas(ClientContext &context, std::function<void(SchemaCatalogEntry &)> callback) override;
@@ -42,9 +36,10 @@ public:
 	                                           QueryErrorContext error_context = QueryErrorContext()) override;
 
 private:
-	const string default_schema;
-	unordered_map<string, unique_ptr<CatalogEntry>> entries;
-	mutex entry_lock;
+	const string schema;
+	// Catalog has a single schema/table entry corresponding to the CSV file
+	unique_ptr<SchemaCatalogEntry> entry;
+	idx_t database_size;
 };
 
 class CsvFileTableEntry : public ReadOnlyTableCatalogEntry {
@@ -64,6 +59,8 @@ public:
 };
 
 class CsvFileSchemaEntry : public ReadOnlySchemaCatalogEntry {
+	friend class CsvFileCatalog;
+
 public:
 	CsvFileSchemaEntry(Catalog &catalog_p, CreateSchemaInfo &info_p, const string &file_p, const string &relname_p,
 					   const vector<LogicalType> &column_types_p, const vector<string> &column_names_p);
@@ -71,8 +68,7 @@ public:
 	void Scan(ClientContext &context, CatalogType type, const std::function<void(CatalogEntry &)> &callback) override;
 	optional_ptr<CatalogEntry> GetEntry(CatalogTransaction transaction, CatalogType type, const string &name_p) override;
 
-private:
-	// SchemaCatalogEntry has a single table entry corresponding to the CSV file
+protected:
 	unique_ptr<CsvFileTableEntry> table;
 };
 
