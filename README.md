@@ -40,7 +40,7 @@ please see [maropu/duckdb_extension_example](https://github.com/maropu/duckdb_ex
  - VARCHAR, BIGINT, and DOUBLE types only supported
  - Schema inference not supported
 
-# Running this example
+# How to run this example
 
 ```bash
 $ git submodule init
@@ -110,6 +110,54 @@ D SELECT * FROM csv.testrel;
 │ ccc     │     3 │   2.56 │
 └─────────┴───────┴────────┘
 ```
+
+# How to compile as WebAssembly code
+
+```shell
+// Compile as WebAssembly code
+$ cd dockerfiles/build-wasm
+$ docker build --tag duckdb-build-wasm ../.. -f ./Dockerfile
+$ docker create --name t duckdb-build-wasm
+$ docker cp t:/workspace/csv_scanner.duckdb_extension.wasm .
+$ docker rm t
+
+// Start a http server for duckdb-wasm
+cd ../duckdb-wasm
+$ docker build --tag duckdb-wasm .
+$ docker create -p 8080:8080 --name duckdb-wasm-app duckdb-wasm
+$ docker cp ../build-wasm/csv_scanner.duckdb_extension.wasm duckdb-wasm-app:/workspace/duckdb-wasm/packages/duckdb-wasm-app/build/release/extension_repository/v1.1.1/wasm_eh
+$ docker start duckdb-wasm-app
+```
+
+ - Access http://127.0.0.1:8080/ and then load the extension as follows:
+
+```sql
+DuckDB Web Shell
+Database: v1.1.1
+Package:  @duckdb/duckdb-wasm@1.11.0
+
+Connected to a local transient in-memory database.
+Enter .help for usage hints.
+
+duckdb> SET custom_extension_repository='http://127.0.0.1:8080/extension_repository';
+duckdb> LOAD csv_scanner;
+duckdb> .files add // Copy test.csv into a browser runtime env
+duckdb> SELECT * FROM scan_csv_ex('test.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
+┌─────────┬───────┬────────┐
+│    a    │   b   │   c    │
+│ varchar │ int64 │ double │
+├─────────┼───────┼────────┤
+│ aaa     │     1 │   1.23 │
+│ bbb     │     2 │   3.14 │
+│ ccc     │     3 │   2.56 │
+└─────────┴───────┴────────┘
+```
+
+# How to compile extensions for multiple platforms
+
+[The DuckDB document](https://duckdb.org/docs/extensions/working_with_extensions.html#platforms) says that extention binaries need to be built for each platform.
+To do so, you can use [duckdb/extension-ci-tools](https://github.com/duckdb/extension-ci-tools) to compile your extension for multiple platforms
+and please see an actual CI job to compiile this extension in [maropu/extension-ci-tools](https://github.com/maropu/extension-ci-tools/actions/workflows/duckdb_scanner_example.yml).
 
 # External Resources
 
