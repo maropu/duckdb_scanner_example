@@ -4,24 +4,6 @@
 
 namespace duckdb {
 
-struct ScanCsvOptions {
-	idx_t buffer_size = CsvBlockIterator::CSV_BUFFER_SIZE;
-};
-
-struct ScanCsvBindData : public TableFunctionData {
-public:
-	explicit ScanCsvBindData(const vector<string> &column_names_p, const vector<LogicalType> &column_types_p,
-							 const ScanCsvOptions &options_p, shared_ptr<FileHandle> file_handle_p)
-		: column_names(column_names_p), column_types(column_types_p), options(options_p), file_handle(file_handle_p) {
-	};
-
-	const vector<string> column_names;
-	const vector<LogicalType> column_types;
-	const ScanCsvOptions options;
-
-	shared_ptr<FileHandle> file_handle;
-};
-
 struct CsvGlobalState : public GlobalTableFunctionState {
 public:
 	CsvGlobalState(idx_t system_threads_p, unique_ptr<CsvBlockIterator> csv_block_iterator_p)
@@ -240,26 +222,26 @@ static void ScanCsvAddNamedParameters(TableFunction &table_function) {
 	table_function.named_parameters["buffer_size"] = LogicalType::UBIGINT;
 }
 
-static TableFunction GetFunction() {
-	TableFunction scan_csv("scan_csv_ex", {LogicalType::VARCHAR, LogicalType::ANY},
-						   ScanCsvFunction, ScanCsvBind, ScanCsvInitGlobal, ScanCsvInitLocal);
-	scan_csv.to_string = ScanCsvToString;
-	scan_csv.table_scan_progress = ScanCsvProgress;
-	scan_csv.get_batch_index = ScanCsvGetBatchIndex;
-	scan_csv.cardinality = ScanCsvCardinality;
-	scan_csv.serialize = ScanCsvSerializer;
-	scan_csv.deserialize = ScanCsvDeserializer;
-	scan_csv.global_initialization = TableFunctionInitialization::INITIALIZE_ON_EXECUTE;
-	scan_csv.projection_pushdown = false;
-	scan_csv.filter_pushdown = false;
-	scan_csv.pushdown_complex_filter = nullptr;
-	scan_csv.type_pushdown = nullptr;
+void CsvScannerFunction::RegisterFunction(DatabaseInstance &db) {
+	auto scan_csv = CsvScanFunction();
 	ScanCsvAddNamedParameters(scan_csv);
-	return scan_csv;
+	ExtensionUtil::RegisterFunction(db, scan_csv);
 }
 
-void CsvScannerFunction::RegisterFunction(DatabaseInstance &db) {
-	ExtensionUtil::RegisterFunction(db, GetFunction());
+CsvScanFunction::CsvScanFunction()
+	: TableFunction("scan_csv_ex", {LogicalType::VARCHAR, LogicalType::ANY},
+					ScanCsvFunction, ScanCsvBind, ScanCsvInitGlobal, ScanCsvInitLocal) {
+	to_string = ScanCsvToString;
+	table_scan_progress = ScanCsvProgress;
+	get_batch_index = ScanCsvGetBatchIndex;
+	cardinality = ScanCsvCardinality;
+	serialize = ScanCsvSerializer;
+	deserialize = ScanCsvDeserializer;
+	global_initialization = TableFunctionInitialization::INITIALIZE_ON_EXECUTE;
+	projection_pushdown = false;
+	filter_pushdown = false;
+	pushdown_complex_filter = nullptr;
+	type_pushdown = nullptr;
 }
 
 CsvBlockIterator::CsvBlockIterator(Allocator &allocator, shared_ptr<FileHandle> file_handle_p, idx_t buffer_size)

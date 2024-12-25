@@ -26,3 +26,14 @@ FROM scan_csv_ex('data/random.csv',
 				 buffer_size=12);
 ----
 buffer_size must be at least 1024 bytes
+
+statement ok
+ATTACH 'file=data/test.csv relname=testrel schema={"a": "varchar", "b": "bigint", "c": "double"}'
+	AS csv (TYPE CSV_SCANNER);
+
+query TIR
+SELECT * FROM csv.testrel;
+----
+aaa	1	1.23
+bbb	2	3.14
+ccc	3	2.56

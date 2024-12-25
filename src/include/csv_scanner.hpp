@@ -14,8 +14,13 @@ namespace duckdb {
 
 #define CSV_SCANNER_EXTENSION_VERSION "1.0.0"
 
-struct CsvScannerFunction {
+struct CsvScannerFunction : public TableFunction {
 	static void RegisterFunction(DatabaseInstance &db);
+};
+
+class CsvScanFunction : public TableFunction {
+public:
+	CsvScanFunction();
 };
 
 struct CsvFileBuffer {
@@ -115,6 +120,24 @@ private:
 	const vector<LogicalType> column_types;
 	unique_ptr<CsvBlock> block;
 	idx_t current_buffer_pos;
+};
+
+struct ScanCsvOptions {
+	idx_t buffer_size = CsvBlockIterator::CSV_BUFFER_SIZE;
+};
+
+struct ScanCsvBindData : public TableFunctionData {
+public:
+	explicit ScanCsvBindData(const vector<string> &column_names_p, const vector<LogicalType> &column_types_p,
+							 const ScanCsvOptions &options_p, shared_ptr<FileHandle> file_handle_p)
+		: column_names(column_names_p), column_types(column_types_p), options(options_p), file_handle(file_handle_p) {
+	};
+
+	const vector<string> column_names;
+	const vector<LogicalType> column_types;
+	const ScanCsvOptions options;
+
+	shared_ptr<FileHandle> file_handle;
 };
 
 } // namespace duckdb

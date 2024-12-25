@@ -21,9 +21,12 @@ please see [maropu/duckdb_extension_example](https://github.com/maropu/duckdb_ex
 |   `-- duckdb_extension.Makefile   // common build configuration to compile extention, copied from `duckdb/extension-ci-tools`
 |-- src
 |   |-- CMakeLists.txt              // CMake build file to list source files
+|   |-- csv_file_storage.cpp        // CSV file storage implementation
 |   |-- csv_scanner_extension.cpp   // CSV parser implmenetation
 |   |-- include
-|   |   `-- csv_scanner.hpp         // Header file for the CSV parser
+|   |   |-- csv_file_storage.hpp    // Header file for CSV file storage
+|   |   |-- csv_scanner.hpp         // Header file for CSV parser
+|   |   `-- read_only_storage.hpp   // Header file for read-only storage
 |   `-- scan_csv.cpp                // Entrypoint where DuckDB loads this extension
 |-- test
 |   `-- sql
@@ -80,6 +83,24 @@ v1.1.3 19864453f7
 Enter ".help" for usage hints.
 D LOAD './build/release/extension/csv_scanner/csv_scanner.duckdb_extension';
 D SELECT * FROM scan_csv_ex('data/test.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
+┌─────────┬───────┬────────┐
+│    a    │   b   │   c    │
+│ varchar │ int64 │ double │
+├─────────┼───────┼────────┤
+│ aaa     │     1 │   1.23 │
+│ bbb     │     2 │   3.14 │
+│ ccc     │     3 │   2.56 │
+└─────────┴───────┴────────┘
+
+D ATTACH 'file=data/test.csv relname=testrel schema={"a": "varchar", "b": "bigint", "c": "double"}' AS csv (TYPE CSV_SCANNER);
+D .databases
+memory:
+csv:
+
+D .tables
+testrel
+
+D SELECT * FROM csv.testrel;
 ┌─────────┬───────┬────────┐
 │    a    │   b   │   c    │
 │ varchar │ int64 │ double │
