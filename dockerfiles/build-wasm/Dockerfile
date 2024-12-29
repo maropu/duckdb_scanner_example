@@ -2,6 +2,8 @@ FROM  ubuntu:24.04
 
 WORKDIR /workspace
 
+ARG DUCKDB_VERSION=v1.1.3
+
 # Install necessary basic packages
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -37,7 +39,7 @@ COPY src duckdb_scanner_example/src
 # Compile extension
 RUN cd duckdb_scanner_example && \
   git clone https://github.com/duckdb/duckdb.git && \
-  DUCKDB_GIT_VERSION=v1.1.1 make set_duckdb_version && \
+  DUCKDB_GIT_VERSION=${DUCKDB_VERSION} make set_duckdb_version && \
   PATH=$PATH:/workspace/emsdk/upstream/emscripten make wasm_eh
 
 # Copy assembly into the top
