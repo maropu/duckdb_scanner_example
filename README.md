@@ -45,15 +45,15 @@ please see [maropu/duckdb_extension_example](https://github.com/maropu/duckdb_ex
 ```bash
 $ git submodule init
 $ git submodule update
-$ DUCKDB_GIT_VERSION=v1.1.3 make set_duckdb_version
+$ DUCKDB_GIT_VERSION=v1.2.0 make set_duckdb_version
 $ make
 mkdir -p build/release && \
 	cmake  -DEXTENSION_STATIC_BUILD=1 -DDUCKDB_EXTENSION_NAMES="csv_scanner" -DDUCKDB_EXTENSION_CSV_SCANNER_PATH="./duckdb/duckdb_scanner_example/" -DDUCKDB_EXTENSION_CSV_SCANNER_SHOULD_LINK=0 -DDUCKDB_EXTENSION_CSV_SCANNER_LOAD_TESTS=1 -DDUCKDB_EXTENSION_CSV_SCANNER_TEST_PATH="./duckdb/duckdb_scanner_example/test/sql" -DOSX_BUILD_ARCH=  -DDUCKDB_EXPLICIT_PLATFORM='' -DCMAKE_BUILD_TYPE=Release -S ./duckdb/ -B build/release && \
 	cmake --build build/release --config Release
--- git hash af39bd0dcf, version v1.1.3, extension folder v1.1.3
+-- git hash af39bd0dcf, version v1.2.0, extension folder v1.2.0
 -- Extensions will be deployed to: ./duckdb/duckdb_scanner_example/build/release/repository
 -- Load extension 'csv_scanner' from './duckdb/duckdb_scanner_example/'
--- Load extension 'parquet' from './duckdb/duckdb_scanner_example/duckdb/extensions' @ v1.1.3
+-- Load extension 'parquet' from './duckdb/duckdb_scanner_example/duckdb/extensions' @ v1.2.0
 -- Extensions linked into DuckDB: [parquet]
 -- Extensions built but not linked: [csv_scanner]
 -- Tests loaded for extensions: [csv_scanner]
@@ -79,7 +79,7 @@ bbb,2,3.14
 ccc,3,2.56
 
 $ duckdb -unsigned
-v1.1.3 19864453f7
+v1.2.0 19864453f7
 Enter ".help" for usage hints.
 D LOAD './build/release/extension/csv_scanner/csv_scanner.duckdb_extension';
 D SELECT * FROM scan_csv_ex('data/test.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'});

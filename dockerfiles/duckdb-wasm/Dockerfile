@@ -57,10 +57,10 @@ FROM base AS build
 
 WORKDIR /workspace
 
-# Preprocess duckdb-wasm (& Make unsigned extensions loadable)
+# Preprocess duckdb-wasm (duckdb v1.2.0) & Make unsigned extensions loadable
 RUN git clone https://github.com/duckdb/duckdb-wasm.git && \
   cd duckdb-wasm && \
-  git checkout 41c03bef54cbc310ba2afa2e5f71f7a22b38364f && \
+  git checkout 6114b61de35c77e89a7feefa72e96842b8015e6a && \
   git submodule init && \
   git submodule update && \
   make apply_patches && \

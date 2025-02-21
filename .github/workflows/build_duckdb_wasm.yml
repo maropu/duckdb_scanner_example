@@ -1,0 +1,28 @@
+name: Build dockdb-wasm
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-wasm:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Build Docker image
+        run: |
+          cd dockerfiles/duckdb-wasm
+          docker build --tag duckdb-wasm .
+      - name: Run duckdb-wasm app
+        run: |
+          cd dockerfiles/duckdb-wasm
+          docker run -p 8080:8080 --name duckdb-wasm-app duckdb-wasm &
+      - name: Access http://127.0.0.1:8080/
+        run: |
+          curl http://127.0.0.1:8080/

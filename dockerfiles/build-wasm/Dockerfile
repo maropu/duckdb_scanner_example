@@ -3,7 +3,7 @@ FROM ubuntu:24.04 AS base
 
 WORKDIR /workspace
 
-ARG DUCKDB_VERSION=v1.1.3
+ARG DUCKDB_VERSION=v1.2.0
 
 # Install necessary basic packages with caching
 RUN --mount=type=cache,id=duckdb-ext-apt,target=/var/cache/apt \

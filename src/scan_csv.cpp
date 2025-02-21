@@ -1,5 +1,6 @@
 #include "csv_scanner.hpp"
 
+#include "duckdb/common/insertion_order_preserving_map.hpp"
 #include "duckdb/main/extension_util.hpp"
 
 namespace duckdb {
@@ -183,9 +184,11 @@ static void ScanCsvFunction(ClientContext &context, TableFunctionInput &data_p, 
 	}
 }
 
-static string ScanCsvToString(const FunctionData *bind_data_p) {
-	auto &bind_data = bind_data_p->Cast<ScanCsvBindData>();
-	return bind_data.file_handle->file_system.ExtractName(bind_data.file_handle->GetPath());
+static InsertionOrderPreservingMap<string> ScanCsvToString(TableFunctionToStringInput &input) {
+	InsertionOrderPreservingMap<string> result;
+	auto &bind_data = input.bind_data->Cast<ScanCsvBindData>();
+	result["File"] = bind_data.file_handle->file_system.ExtractName(bind_data.file_handle->GetPath());
+	return result;
 }
 
 static double ScanCsvProgress(ClientContext &context, const FunctionData *bind_data_p,
@@ -197,9 +200,9 @@ static double ScanCsvProgress(ClientContext &context, const FunctionData *bind_d
 	return data.GetProgress();
 }
 
-static idx_t ScanCsvGetBatchIndex(ClientContext &context, const FunctionData *bind_data_p,
-								  LocalTableFunctionState *local_state, GlobalTableFunctionState *global_state) {
-	return (local_state->Cast<CsvLocalState>()).csv_reader->GetReaderIndex();
+static OperatorPartitionData ScanCsvGetPartitionData(ClientContext &context, TableFunctionGetPartitionInput &input) {
+	auto batch_idx = (input.local_state->Cast<CsvLocalState>()).csv_reader->GetReaderIndex();
+	return OperatorPartitionData(batch_idx);
 }
 
 static unique_ptr<NodeStatistics> ScanCsvCardinality(ClientContext &context, const FunctionData *bind_data_p) {
@@ -233,7 +236,7 @@ CsvScanFunction::CsvScanFunction()
 					ScanCsvFunction, ScanCsvBind, ScanCsvInitGlobal, ScanCsvInitLocal) {
 	to_string = ScanCsvToString;
 	table_scan_progress = ScanCsvProgress;
-	get_batch_index = ScanCsvGetBatchIndex;
+	get_partition_data = ScanCsvGetPartitionData;
 	cardinality = ScanCsvCardinality;
 	serialize = ScanCsvSerializer;
 	deserialize = ScanCsvDeserializer;
