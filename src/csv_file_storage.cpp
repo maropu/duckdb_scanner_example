@@ -31,7 +31,7 @@ static string ParseNamedParameter(const string &name, const string &connection_s
 }
 
 static void ParseSchemaString(ClientContext &context, const string &schema_string,
-							  std::vector<LogicalType> &column_types, std::vector<string> &column_names) {
+                              std::vector<LogicalType> &column_types, std::vector<string> &column_names) {
 	string current_key;
 	string current_value;
 	bool in_key = true;
@@ -59,7 +59,7 @@ static void ParseSchemaString(ClientContext &context, const string &schema_strin
 }
 
 static void ParseSchemaFromSchemaString(ClientContext &context, const string &schema_string,
-										vector<LogicalType> &column_types, vector<string> &column_names) {
+                                        vector<LogicalType> &column_types, vector<string> &column_names) {
 	auto test = TransformStringToLogicalType(schema_string, context);
 	auto schema = StringUtil::ParseJSONMap(schema_string);
 	for (auto &entry : schema) {
@@ -71,8 +71,8 @@ static void ParseSchemaFromSchemaString(ClientContext &context, const string &sc
 
 // ATTACH 'file=data/test.csv relname=testrel schema={"a": "varchar", "b": "bigint", "c": "double"}' AS csv (TYPE CSV_SCANNER);
 static unique_ptr<Catalog> CsvFileAttach(StorageExtensionInfo *storage_info, ClientContext &context,
-										 AttachedDatabase &db, const string &name, AttachInfo &info,
-										 AccessMode access_mode) {
+                                         AttachedDatabase &db, const string &name, AttachInfo &info,
+                                         AccessMode access_mode) {
 	string connection_string = info.path;
 	string file = ParseNamedParameter("file", connection_string);
 	string relname = ParseNamedParameter("relname", connection_string);
@@ -89,8 +89,8 @@ CsvFileStorageExtension::CsvFileStorageExtension() {
 }
 
 CsvFileCatalog::CsvFileCatalog(AttachedDatabase &db_p, const string &file_p, const string &schname_p,
-							   const string &relname_p, const vector<LogicalType> &column_types_p,
-							   const vector<string> &column_names_p)
+                               const string &relname_p, const vector<LogicalType> &column_types_p,
+                               const vector<string> &column_names_p)
 	: ReadOnlyCatalog(db_p), schema(schname_p), database_size(0) {
 	CreateSchemaInfo info;
 	entry = make_uniq<CsvFileSchemaEntry>(*this, info, file_p, relname_p, column_types_p, column_names_p);
@@ -115,8 +115,8 @@ void CsvFileCatalog::ScanSchemas(ClientContext &context, std::function<void(Sche
 }
 
 optional_ptr<SchemaCatalogEntry> CsvFileCatalog::GetSchema(CatalogTransaction transaction, const string &schema_name,
-														   OnEntryNotFound if_not_found,
-														   QueryErrorContext error_context) {
+                                                           OnEntryNotFound if_not_found,
+                                                           QueryErrorContext error_context) {
 	if (schema_name == DEFAULT_SCHEMA) {
 		return GetSchema(transaction, schema, if_not_found, error_context);
 	}
@@ -130,8 +130,8 @@ optional_ptr<SchemaCatalogEntry> CsvFileCatalog::GetSchema(CatalogTransaction tr
 }
 
 CsvFileTableEntry::CsvFileTableEntry(Catalog &catalog_p, SchemaCatalogEntry &schema_p, CreateTableInfo &info_p,
-									 const string &file_p, const string &relname_p,
-									 const vector<LogicalType> &column_types_p, const vector<string> &column_names_p)
+                                     const string &file_p, const string &relname_p,
+                                     const vector<LogicalType> &column_types_p, const vector<string> &column_names_p)
 	: ReadOnlyTableCatalogEntry(catalog_p, schema_p, info_p), file(file_p), relname(relname_p),
 	  column_types(column_types_p), column_names(column_names_p) {
 }
@@ -156,8 +156,8 @@ TableStorageInfo CsvFileTableEntry::GetStorageInfo(ClientContext &context) {
 }
 
 CsvFileSchemaEntry::CsvFileSchemaEntry(Catalog &catalog, CreateSchemaInfo &info, const string &file_p,
-									   const string &relname_p, const vector<LogicalType> &column_types_p,
-									   const vector<string> &column_names_p)
+                                       const string &relname_p, const vector<LogicalType> &column_types_p,
+                                       const vector<string> &column_names_p)
 	: ReadOnlySchemaCatalogEntry(catalog, info) {
 	CreateTableInfo table_info(*this, relname_p);
 	for (idx_t i = 0; i < column_names_p.size(); i++) {
@@ -168,7 +168,7 @@ CsvFileSchemaEntry::CsvFileSchemaEntry(Catalog &catalog, CreateSchemaInfo &info,
 }
 
 void CsvFileSchemaEntry::Scan(ClientContext &context, CatalogType type,
-							  const std::function<void(CatalogEntry &)> &callback) {
+                              const std::function<void(CatalogEntry &)> &callback) {
 	if (!CatalogTypeIsSupported(type)) {
 		return;
 	}
@@ -176,7 +176,7 @@ void CsvFileSchemaEntry::Scan(ClientContext &context, CatalogType type,
 }
 
 optional_ptr<CatalogEntry> CsvFileSchemaEntry::GetEntry(CatalogTransaction transaction, CatalogType type,
-														const string &name) {
+                                                        const string &name) {
 	if (CatalogTypeIsSupported(type) && name == table->relname) {
 		return table.get();
 	}

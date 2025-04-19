@@ -100,7 +100,7 @@ private:
 struct CsvReader {
 public:
 	explicit CsvReader(idx_t idx, const vector<string> &column_names_p, const vector<LogicalType> &column_types_p,
-					   unique_ptr<CsvBlock> block_p);
+	                   unique_ptr<CsvBlock> block_p);
 
 	//! Flushes the result to the chunk
 	void Flush(DataChunk &chunk);
@@ -129,7 +129,7 @@ struct ScanCsvOptions {
 struct ScanCsvBindData : public TableFunctionData {
 public:
 	explicit ScanCsvBindData(const vector<string> &column_names_p, const vector<LogicalType> &column_types_p,
-							 const ScanCsvOptions &options_p, shared_ptr<FileHandle> file_handle_p)
+	                         const ScanCsvOptions &options_p, shared_ptr<FileHandle> file_handle_p)
 		: column_names(column_names_p), column_types(column_types_p), options(options_p), file_handle(file_handle_p) {
 	};
 

@@ -69,7 +69,7 @@ public:
 };
 
 static void ParseSchemaFromParam(ClientContext &context, const Value &param,
-								 vector<LogicalType> &column_types, vector<string> &column_names) {
+                                 vector<LogicalType> &column_types, vector<string> &column_names) {
 	auto &param_type = param.type();
 	if (param_type.id() != LogicalTypeId::STRUCT) {
 		throw BinderException("schema param requires a struct as input");
@@ -117,7 +117,7 @@ static const ScanCsvOptions ParseNamedParameters(named_parameter_map_t &in, Clie
 }
 
 static duckdb::unique_ptr<FunctionData> ScanCsvBind(ClientContext &context, TableFunctionBindInput &input,
-													vector<LogicalType> &return_types, vector<string> &names) {
+                                                    vector<LogicalType> &return_types, vector<string> &names) {
 	D_ASSERT(input.inputs.size() == 2);
 	auto &file_path = StringValue::Get(input.inputs[0]);
 	auto &fs = FileSystem::GetFileSystem(context);
@@ -192,7 +192,7 @@ static InsertionOrderPreservingMap<string> ScanCsvToString(TableFunctionToString
 }
 
 static double ScanCsvProgress(ClientContext &context, const FunctionData *bind_data_p,
-							  const GlobalTableFunctionState *global_state) {
+                              const GlobalTableFunctionState *global_state) {
 	if (!global_state) {
 		return 0.0;
 	}
@@ -213,7 +213,7 @@ static unique_ptr<NodeStatistics> ScanCsvCardinality(ClientContext &context, con
 }
 
 static void ScanCsvSerializer(Serializer &serializer, const optional_ptr<FunctionData> bind_data_p,
-							  const TableFunction &function) {
+                              const TableFunction &function) {
 	throw NotImplementedException("ScanCsvSerialize");
 }
 
@@ -233,7 +233,7 @@ void CsvScannerFunction::RegisterFunction(DatabaseInstance &db) {
 
 CsvScanFunction::CsvScanFunction()
 	: TableFunction("scan_csv_ex", {LogicalType::VARCHAR, LogicalType::ANY},
-					ScanCsvFunction, ScanCsvBind, ScanCsvInitGlobal, ScanCsvInitLocal) {
+	                ScanCsvFunction, ScanCsvBind, ScanCsvInitGlobal, ScanCsvInitLocal) {
 	to_string = ScanCsvToString;
 	table_scan_progress = ScanCsvProgress;
 	get_partition_data = ScanCsvGetPartitionData;
@@ -286,7 +286,7 @@ unique_ptr<CsvBlock> CsvBlockIterator::Next() {
 }
 
 CsvReader::CsvReader(idx_t idx, const vector<string> &column_names_p, const vector<LogicalType> &column_types_p,
-					 unique_ptr<CsvBlock> block_p)
+                     unique_ptr<CsvBlock> block_p)
 	: reader_idx(idx), column_names(column_names_p), column_types(column_types_p),
 	  block(std::move(block_p)), current_buffer_pos(0) {
 }

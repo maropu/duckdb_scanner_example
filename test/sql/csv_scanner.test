@@ -5,8 +5,7 @@
 require csv_scanner
 
 query TIR
-SELECT * FROM scan_csv_ex('data/test.csv',
-						  {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
+SELECT * FROM scan_csv_ex('data/test.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
 ----
 aaa	1	1.23
 bbb	2	3.14
@@ -14,16 +13,13 @@ ccc	3	2.56
 
 query IRR
 SELECT count(1), sum(b), sum(c)
-FROM scan_csv_ex('data/random.csv',
-				 {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
+FROM scan_csv_ex('data/random.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'});
 ----
 300000	15156364	15041450.940000182
 
 statement error
 SELECT COUNT(1), SUM(b), SUM(c)
-FROM scan_csv_ex('data/random.csv',
-				 {'a': 'varchar', 'b': 'bigint', 'c': 'double'},
-				 buffer_size=12);
+FROM scan_csv_ex('data/random.csv', {'a': 'varchar', 'b': 'bigint', 'c': 'double'}, buffer_size=12);
 ----
 buffer_size must be at least 1024 bytes
 

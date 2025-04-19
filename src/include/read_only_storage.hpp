@@ -63,35 +63,35 @@ public:
 	virtual void Initialize(bool load_builtin) override = 0;
 	virtual void ScanSchemas(ClientContext &context, std::function<void(SchemaCatalogEntry &)> callback) override = 0;
 	virtual optional_ptr<SchemaCatalogEntry> GetSchema(CatalogTransaction transaction, const string &schema_name,
-													   OnEntryNotFound if_not_found,
-													   QueryErrorContext error_context = QueryErrorContext()) override = 0;
+	                                                   OnEntryNotFound if_not_found,
+	                                                   QueryErrorContext error_context = QueryErrorContext()) override = 0;
 
 	optional_ptr<CatalogEntry> CreateSchema(CatalogTransaction transaction, CreateSchemaInfo &info) override {
 		throw NotImplementedException("CreateSchema is not supported for read-only storage");
 	}
 
 	unique_ptr<PhysicalOperator> PlanInsert(ClientContext &context, LogicalInsert &op,
-											unique_ptr<PhysicalOperator> plan) override {
+	                                        unique_ptr<PhysicalOperator> plan) override {
 		throw NotImplementedException("PlanInsert is not supported for read-only storage");
 	}
 
 	unique_ptr<PhysicalOperator> PlanCreateTableAs(ClientContext &context, LogicalCreateTable &op,
-												   unique_ptr<PhysicalOperator> plan) override {
+	                                               unique_ptr<PhysicalOperator> plan) override {
 		throw NotImplementedException("PlanCreateTableAs is not supported for read-only storage");
 	}
 
 	unique_ptr<PhysicalOperator> PlanDelete(ClientContext &context, LogicalDelete &op,
-											unique_ptr<PhysicalOperator> plan) override {
+	                                        unique_ptr<PhysicalOperator> plan) override {
 		throw NotImplementedException("PlanDelete is not supported for read-only storage");
 	}
 
 	unique_ptr<PhysicalOperator> PlanUpdate(ClientContext &context, LogicalUpdate &op,
-											unique_ptr<PhysicalOperator> plan) override {
+	                                        unique_ptr<PhysicalOperator> plan) override {
 		throw NotImplementedException("PlanUpdate is not supported for read-only storage");
 	}
 
 	unique_ptr<LogicalOperator> BindCreateIndex(Binder &binder, CreateStatement &stmt, TableCatalogEntry &table,
-												unique_ptr<LogicalOperator> plan) override {
+	                                            unique_ptr<LogicalOperator> plan) override {
 		throw NotImplementedException("BindCreateIndex is not supported for read-only storage");
 	}
 
@@ -123,7 +123,7 @@ public:
 	}
 
 	virtual void Scan(ClientContext &context, CatalogType type,
-					  const std::function<void(CatalogEntry &)> &callback) override = 0;
+	                  const std::function<void(CatalogEntry &)> &callback) override = 0;
 	virtual optional_ptr<CatalogEntry> GetEntry(CatalogTransaction transaction, CatalogType type,
 												const string &name_p) override = 0;
 
@@ -149,17 +149,17 @@ public:
 	}
 
 	optional_ptr<CatalogEntry> CreateTableFunction(CatalogTransaction transaction,
-												   CreateTableFunctionInfo &info) override {
+	                                               CreateTableFunctionInfo &info) override {
 		throw NotImplementedException("CreateTableFunction is not supported for read-only storage");
 	}
 
 	optional_ptr<CatalogEntry> CreateCopyFunction(CatalogTransaction transaction,
-												  CreateCopyFunctionInfo &info) override {
+	                                              CreateCopyFunctionInfo &info) override {
 		throw NotImplementedException("CreateCopyFunction is not supported for read-only storage");
 	}
 
 	optional_ptr<CatalogEntry> CreatePragmaFunction(CatalogTransaction transaction,
-													CreatePragmaFunctionInfo &info) override {
+	                                                CreatePragmaFunctionInfo &info) override {
 		throw NotImplementedException("CreatePragmaFunction is not supported for read-only storage");
 	}
 
@@ -201,7 +201,7 @@ public:
 	}
 
 	static unique_ptr<TransactionManager> Create(StorageExtensionInfo *storage_info, AttachedDatabase &db,
-												 Catalog &catalog) {
+	                                             Catalog &catalog) {
 		return make_uniq<NoOpTransactionManager>(db);
 	}
 

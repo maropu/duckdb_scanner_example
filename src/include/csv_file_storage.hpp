@@ -20,8 +20,8 @@ public:
 class CsvFileCatalog : public ReadOnlyCatalog {
 public:
 	explicit CsvFileCatalog(AttachedDatabase &db_p, const string &file_p, const string &schname_p,
-							const string &relname_p, const vector<LogicalType> &column_types_p,
-							const vector<string> &column_names_p);
+	                        const string &relname_p, const vector<LogicalType> &column_types_p,
+	                        const vector<string> &column_names_p);
 
 	string GetCatalogType() override {
 		return "csv_scanner";
@@ -45,8 +45,8 @@ private:
 class CsvFileTableEntry : public ReadOnlyTableCatalogEntry {
 public:
 	CsvFileTableEntry(Catalog &catalog_p, SchemaCatalogEntry &schema_p, CreateTableInfo &info_p, const string &file_p,
-					  const string &relname_p, const vector<LogicalType> &column_types_p,
-					  const vector<string> &column_names_p);
+	                  const string &relname_p, const vector<LogicalType> &column_types_p,
+	                  const vector<string> &column_names_p);
 
 	unique_ptr<BaseStatistics> GetStatistics(ClientContext &context, column_t column_id) override;
 	TableFunction GetScanFunction(ClientContext &context, unique_ptr<FunctionData> &bind_data) override;
@@ -63,7 +63,7 @@ class CsvFileSchemaEntry : public ReadOnlySchemaCatalogEntry {
 
 public:
 	CsvFileSchemaEntry(Catalog &catalog_p, CreateSchemaInfo &info_p, const string &file_p, const string &relname_p,
-					   const vector<LogicalType> &column_types_p, const vector<string> &column_names_p);
+	                   const vector<LogicalType> &column_types_p, const vector<string> &column_names_p);
 
 	void Scan(ClientContext &context, CatalogType type, const std::function<void(CatalogEntry &)> &callback) override;
 	optional_ptr<CatalogEntry> GetEntry(CatalogTransaction transaction, CatalogType type, const string &name_p) override;
